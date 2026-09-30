@@ -11,6 +11,21 @@ services:
     - ./configs/ot-sim/node-red.json:/etc/node-red.json
     ports:
     - 1880:1880
+    - 8080:8080 # noVNC Wireshark (served from the wireshark sidecar, which shares this container's netns)
     environment:
     - OTSIM_TAILSCALE_AUTHKEY=${OTSIM_TAILSCALE_AUTHKEY} # for Tailscale
     hostname: ${HOSTNAME} # for Tailscale
+  wireshark:
+    # Shares the hmi container's network namespace so Wireshark can see tailscale0
+    # and live-capture the farm<->turbine DNP3. (The turbine repo uses network_mode:
+    # host because its Modbus is on host interfaces; the farm's DNP3 rides Tailscale
+    # inside the hmi container, so we join that namespace instead.)
+    image: ghcr.io/patsec/wind-turbine/tools:main
+    init: true
+    privileged: true # required for capturing traffic
+    network_mode: "service:hmi"
+    depends_on:
+    - hmi
+    volumes:
+    - ./configs/docker/tigervnc-wireshark.conf:/etc/supervisor/conf.d/tigervnc-wireshark.conf
+    - ./configs/docker/wireshark.conf:/etc/supervisor/conf.d/wireshark.conf
