@@ -1,0 +1,28 @@
+{
+  // Keep-alive: keeps the farm Codespace awake WHILE you are actually working
+  // through a lab service port (Farm HMI 1880, noVNC Wireshark 8080). Clicking in
+  // those browser tabs does NOT reset the Codespace idle timer (only terminal/
+  // editor activity does), so this task heartbeats to the terminal once a minute
+  // to stand in for that -- but ONLY while one of those ports has an active
+  // browser connection.
+  //
+  // The logic lives in scripts/keepalive.sh: it watches those ports with 'ss',
+  // stays awake while a tab is connected, then after a short grace window
+  // (default 5 min) with no connections it STOPS. A hard cap (default 4 h) bounds
+  // the total -- generous because the instructor runs this farm all class.
+  //
+  // Tune via Codespaces variables KEEPALIVE_PORTS / KEEPALIVE_GRACE_MIN /
+  // KEEPALIVE_CAP_MIN, or remove this file to turn it off.
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "keep-alive",
+      "type": "shell",
+      "command": "bash scripts/keepalive.sh",
+      "isBackground": true,
+      "runOptions": { "runOn": "folderOpen" },
+      "presentation": { "reveal": "silent", "panel": "dedicated" },
+      "problemMatcher": []
+    }
+  ]
+}
