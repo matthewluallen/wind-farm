@@ -1,0 +1,4 @@
+{
+  // Auto-run the folderOpen keep-alive task without the "Allow Automatic Tasks" prompt.
+  "task.allowAutomaticTasks": "on"
+}
